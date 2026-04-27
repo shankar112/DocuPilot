@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Enterprise RAG Chatbot</title>
+  <title>DocuPilot</title>
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="16" fill="%23ffffff"/%3E%3Ctext x="32" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="23" font-weight="900" fill="%23171717"%3EDP%3C/text%3E%3C/svg%3E'
+  />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
@@ -35,7 +40,7 @@
     <aside class="hidden w-[260px] shrink-0 flex-col bg-app-shell text-zinc-100 md:flex">
       <div class="flex h-16 items-center justify-between px-4">
         <div class="flex items-center gap-3">
-          <div class="grid h-9 w-9 place-items-center rounded-full bg-white text-sm font-black text-app-shell">AI</div>
+          <div class="grid h-9 w-9 place-items-center rounded-full bg-white text-sm font-black text-app-shell">DP</div>
           <div>
             <h1 class="text-sm font-bold leading-4">DocuPilot</h1>
             <p class="text-xs font-medium text-zinc-400">Enterprise RAG</p>
@@ -84,7 +89,7 @@
             <i data-lucide="menu" class="h-6 w-6"></i>
           </button>
           <button class="flex items-center gap-2 rounded-xl px-3 py-2 text-xl font-semibold text-zinc-100 transition hover:bg-white/10">
-            Enterprise RAG Chatbot
+            DocuPilot
             <i data-lucide="chevron-down" class="h-5 w-5 text-zinc-400"></i>
           </button>
         </div>
@@ -157,6 +162,7 @@
     const statusDot = document.getElementById("statusDot");
     const statusText = document.getElementById("statusText");
     const welcomeTemplate = document.getElementById("welcomePanel").outerHTML;
+    const API_BASE_URL = "https://docupilot-5kvk.onrender.com";
 
     if (window.lucide) {
       lucide.createIcons();
@@ -318,7 +324,7 @@
       setBackendStatus("checking");
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/health", {
+        const response = await fetch(`${API_BASE_URL}/api/health`, {
           method: "GET",
           cache: "no-store",
         });
@@ -364,7 +370,7 @@
       const thinkingIndicator = addThinkingIndicator();
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/ask", {
+        const response = await fetch(`${API_BASE_URL}/api/ask`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
