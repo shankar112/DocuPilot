@@ -1,5 +1,6 @@
 import os
 from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
@@ -14,7 +15,8 @@ from pydantic import BaseModel, Field
 
 load_dotenv()
 
-CHROMA_PERSIST_DIR = "./chroma_db"
+BASE_DIR = Path(__file__).resolve().parent
+CHROMA_PERSIST_DIR = BASE_DIR / "chroma_db"
 EMBEDDING_MODEL = "gemini-embedding-001"
 GENERATION_MODEL = "gemini-2.5-flash"
 
@@ -111,14 +113,19 @@ def get_vector_store() -> Chroma:
     api_key = _get_api_key()
 
     if not os.path.isdir(CHROMA_PERSIST_DIR):
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Chroma database not found at {CHROMA_PERSIST_DIR}.",
-        )
+        try:
+            from ingest import ingest_pdf
+
+            ingest_pdf()
+        except Exception as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Chroma database not found and automatic ingestion failed: {exc}",
+            ) from exc
 
     embeddings = GoogleGenAIEmbeddings(api_key=api_key)
     return Chroma(
-        persist_directory=CHROMA_PERSIST_DIR,
+        persist_directory=str(CHROMA_PERSIST_DIR),
         embedding_function=embeddings,
     )
 
