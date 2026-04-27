@@ -162,7 +162,11 @@
     const statusDot = document.getElementById("statusDot");
     const statusText = document.getElementById("statusText");
     const welcomeTemplate = document.getElementById("welcomePanel").outerHTML;
-    const API_BASE_URL = "https://docupilot-5kvk.onrender.com";
+    const RENDER_API_BASE_URL = "https://docupilot-5kvk.onrender.com";
+    const LOCAL_API_BASE_URL = "http://127.0.0.1:8000";
+    const API_BASE_URL = ["localhost", "127.0.0.1"].includes(window.location.hostname)
+      ? LOCAL_API_BASE_URL
+      : RENDER_API_BASE_URL;
 
     if (window.lucide) {
       lucide.createIcons();
@@ -379,7 +383,14 @@
         });
 
         if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`);
+          let detail = `Request failed with status ${response.status}`;
+          try {
+            const errorData = await response.json();
+            detail = errorData.detail || detail;
+          } catch (parseError) {
+            // Keep the status message when the response is not JSON.
+          }
+          throw new Error(detail);
         }
 
         const data = await response.json();
@@ -387,7 +398,7 @@
         addAiMessage(getAnswerPayload(data), getSourceContext(data));
       } catch (error) {
         thinkingIndicator.remove();
-        addErrorMessage("Sorry, I could not reach the server or process the response. Please try again.");
+        addErrorMessage(`Sorry, I could not process the response. ${error.message}`);
       } finally {
         setLoading(false);
         questionInput.focus();
