@@ -22,8 +22,14 @@ EMBEDDING_MODEL = "gemini-embedding-001"
 GENERATION_MODEL = "gemini-2.5-flash"
 
 
+class Message(BaseModel):
+    role: str
+    text: str
+
+
 class AskRequest(BaseModel):
     question: str = Field(..., min_length=1, description="User question to answer.")
+    history: list[Message] = Field(default_factory=list)
 
 
 class AskResponse(BaseModel):
@@ -175,8 +181,17 @@ def ask(request: AskRequest) -> AskResponse:
         )
 
     try:
+        history_contents = [
+            types.Content(
+                role=msg.role,
+                parts=[types.Part.from_text(text=msg.text)],
+            )
+            for msg in request.history
+        ]
+
         chat = get_genai_client().chats.create(
             model=GENERATION_MODEL,
+            history=history_contents,
             config=types.GenerateContentConfig(
                 tools=[search_hr_policy, calculate_days_between],
             ),
