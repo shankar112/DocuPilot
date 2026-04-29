@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -130,15 +131,31 @@ def get_vector_store() -> Chroma:
     )
 
 
-def _build_prompt(source_context: str, question: str) -> str:
-    return (
-        "You are DocuPilot, a precise assistant answering from retrieved context.\n"
-        "Use only the context when possible. If the answer is not in the context, "
-        "say that the provided context does not contain enough information.\n\n"
-        f"Context:\n{source_context}\n\n"
-        f"Question:\n{question}\n\n"
-        "Answer:"
-    )
+def calculate_days_between(start_date: str, end_date: str) -> int:
+    """Return the whole number of days between two dates formatted as YYYY-MM-DD.
+
+    Args:
+        start_date: The starting date in YYYY-MM-DD format.
+        end_date: The ending date in YYYY-MM-DD format.
+
+    Returns:
+        The integer number of days from start_date to end_date.
+
+    Raises:
+        ValueError: If either date is not formatted as YYYY-MM-DD.
+    """
+    start = datetime.strptime(start_date, "%Y-%m-%d").date()
+    end = datetime.strptime(end_date, "%Y-%m-%d").date()
+    return (end - start).days
+
+
+def search_hr_policy(query: str) -> str:
+    """Search the local HR policy vector store and return the top matching passage."""
+    vector_store = get_vector_store()
+    documents = vector_store.similarity_search(query, k=1)
+    if not documents:
+        raise RuntimeError("No matching context found in the local Chroma database.")
+    return documents[0].page_content
 
 
 @app.post(
@@ -158,26 +175,22 @@ def ask(request: AskRequest) -> AskResponse:
         )
 
     try:
-        vector_store = get_vector_store()
-        documents = vector_store.similarity_search(question, k=1)
-        if not documents:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No matching context found in the local Chroma database.",
-            )
-
-        source_context = documents[0].page_content
-        prompt = _build_prompt(source_context=source_context, question=question)
-        response = get_genai_client().models.generate_content(
+        chat = get_genai_client().chats.create(
             model=GENERATION_MODEL,
-            contents=prompt,
+            config=types.GenerateContentConfig(
+                tools=[search_hr_policy, calculate_days_between],
+            ),
         )
+        response = chat.send_message(question)
 
         answer = (getattr(response, "text", None) or "").strip()
         if not answer:
             raise RuntimeError("Gemini response did not include answer text.")
 
-        return AskResponse(answer=answer, source_context=source_context)
+        return AskResponse(
+            answer=answer,
+            source_context="Agent orchestrated tools to answer this request.",
+        )
     except HTTPException:
         raise
     except ValueError as exc:
