@@ -167,6 +167,7 @@
     const API_BASE_URL = ["localhost", "127.0.0.1"].includes(window.location.hostname)
       ? LOCAL_API_BASE_URL
       : RENDER_API_BASE_URL;
+    let chatHistory = JSON.parse(sessionStorage.getItem("chatHistory")) || [];
 
     if (window.lucide) {
       lucide.createIcons();
@@ -280,6 +281,20 @@
       return wrapper;
     }
 
+    function renderChatHistory() {
+      chatHistory.forEach((message) => {
+        if (message.role === "user") {
+          addUserMessage(message.text);
+        } else if (message.role === "model") {
+          addAiMessage(message.text);
+        }
+      });
+    }
+
+    function saveChatHistory() {
+      sessionStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+    }
+
     function setLoading(isLoading) {
       sendButton.disabled = isLoading;
       questionInput.disabled = isLoading;
@@ -292,6 +307,8 @@
     }
 
     function resetChat() {
+      chatHistory = [];
+      sessionStorage.removeItem("chatHistory");
       messagesColumn.innerHTML = welcomeTemplate;
       questionInput.value = "";
       questionInput.style.height = "auto";
@@ -345,6 +362,7 @@
     }
 
     newChatButton.addEventListener("click", resetChat);
+    window.addEventListener("load", renderChatHistory);
     checkBackendHealth();
     window.setInterval(checkBackendHealth, 15000);
 
@@ -379,7 +397,7 @@
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ question }),
+          body: JSON.stringify({ question, chatHistory }),
         });
 
         if (!response.ok) {
@@ -394,8 +412,12 @@
         }
 
         const data = await response.json();
+        const answer = getAnswerPayload(data);
         thinkingIndicator.remove();
-        addAiMessage(getAnswerPayload(data), getSourceContext(data));
+        addAiMessage(answer, getSourceContext(data));
+        chatHistory.push({ role: "user", text: question });
+        chatHistory.push({ role: "model", text: answer });
+        saveChatHistory();
       } catch (error) {
         thinkingIndicator.remove();
         addErrorMessage(`Sorry, I could not process the response. ${error.message}`);
