@@ -31,7 +31,10 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] **React Standards**: Components are functional and use Hooks; no inline styles (Tailwind only).
+- [ ] **Robustness**: Network requests are wrapped in try/catch; loading/error states planned.
+- [ ] **Security**: API keys managed via env variables; input sanitization planned.
+- [ ] **Accessibility**: Semantic HTML used; keyboard navigation and aria-labels included.
 
 ## Project Structure
 

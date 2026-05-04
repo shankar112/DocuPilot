@@ -90,6 +90,11 @@
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
 
+#### Safety & Accessibility
+
+- **FR-A11Y**: System MUST [accessibility requirement, e.g., "be navigable via keyboard"]
+- **FR-ERR**: System MUST [error handling requirement, e.g., "display user-friendly error messages on network failure"]
+
 *Example of marking unclear requirements:*
 
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]

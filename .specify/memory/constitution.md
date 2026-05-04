@@ -1,50 +1,64 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+<sync_impact_report>
+- Version change: N/A -> 1.0.0
+- List of modified principles:
+  - [PRINCIPLE_1_NAME] -> Code Quality & React Standards
+  - [PRINCIPLE_2_NAME] -> Robustness & Error Handling
+  - [PRINCIPLE_3_NAME] -> Security & Safety
+  - [PRINCIPLE_4_NAME] -> Accessibility (a11y)
+- Added sections: Technology Stack, Development Workflow
+- Removed sections: [PRINCIPLE_5_NAME]
+- Templates requiring updates:
+  - .specify/templates/plan-template.md (✅ updated)
+  - .specify/templates/spec-template.md (✅ updated)
+  - .specify/templates/tasks-template.md (✅ updated)
+- Follow-up TODOs: None
+</sync_impact_report>
+-->
+
+# DocuPilot Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### Code Quality & React Standards
+- Use React functional components and Hooks exclusively. Never use class components.
+- Write clean, modular, and DRY (Don't Repeat Yourself) code.
+- Never use inline styles. All styling MUST use Tailwind CSS utility classes exclusively.
+- Rationale: Ensures a modern, maintainable codebase and consistent design system.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### Robustness & Error Handling
+- Never let the application fail silently. All network requests MUST be wrapped in `try/catch` blocks.
+- All errors MUST be logged to the console with context and caught gracefully to prevent application crashes.
+- Always handle loading states and display user-friendly error messages in the UI when a failure occurs.
+- Rationale: Guarantees a stable user experience and facilitates rapid debugging.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### Security & Safety
+- Never hardcode sensitive API keys; always use environment variables.
+- Always sanitize user input before rendering it to the DOM to prevent XSS (Cross-Site Scripting) attacks.
+- Safely wrap browser APIs like `sessionStorage` in `try/catch` blocks in case the user's browser has disabled local storage.
+- Rationale: Protects user data and ensures application resilience across different environments.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### Accessibility (a11y)
+- Ensure semantic HTML is used throughout the application.
+- All interactive elements (buttons, text areas) MUST have appropriate `aria-labels` or associated visual labels.
+- The application MUST be fully navigable and usable using only a keyboard.
+- Rationale: Ensures the application is inclusive and usable by everyone, regardless of ability.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+## Technology Stack
+- **Frontend**: React (Functional Components, Hooks), Tailwind CSS.
+- **Backend**: FastAPI, Python 3.11+.
+- **AI**: Google GenAI (Gemini), LangChain.
+- **Database**: ChromaDB (Vector Store).
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
-
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Development Workflow
+- Follow the Research -> Strategy -> Execution cycle for all features.
+- Maintain strict alignment between implementation plans (`plan.md`) and source code.
+- Prioritize user stories and ensure each is independently testable.
+- All code changes MUST undergo peer review or agent-based validation against these principles.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+- This constitution supersedes all other development practices within the project.
+- Amendments require documentation of rationale and a semantic version increment.
+- Compliance is verified during the "Constitution Check" phase of the implementation plan.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-05-04 | **Last Amended**: 2026-05-04
