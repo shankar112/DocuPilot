@@ -88,16 +88,52 @@ app = FastAPI(title="DocuPilot API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
+class ChatHistory(BaseModel):
+    messages: list[Message]
+
+
+CHAT_HISTORY_FILE = BASE_DIR / "chat_history.json"
+
+
 @app.get("/api/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     return HealthResponse(status="ok")
+
+
+@app.get("/api/history", response_model=ChatHistory)
+def get_history() -> ChatHistory:
+    """Retrieve chat history from the local JSON file."""
+    if CHAT_HISTORY_FILE.exists():
+        try:
+            with open(CHAT_HISTORY_FILE, "r") as f:
+                import json
+                data = json.load(f)
+                return ChatHistory(messages=data.get("messages", []))
+        except Exception:
+            return ChatHistory(messages=[])
+    return ChatHistory(messages=[])
+
+
+@app.post("/api/history")
+def save_history(history: ChatHistory):
+    """Save chat history to the local JSON file."""
+    try:
+        with open(CHAT_HISTORY_FILE, "w") as f:
+            import json
+            json.dump(history.model_dump(), f)
+        return {"status": "success"}
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to save history: {exc}",
+        )
 
 
 def _get_api_key() -> str:

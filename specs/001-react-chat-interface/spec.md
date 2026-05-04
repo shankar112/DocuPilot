@@ -65,8 +65,8 @@ As a user, I want to be informed if a network error occurs or if the system is u
 - **FR-002**: System MUST feature a fixed input bar at the bottom of the viewport with a text area that auto-expands with content.
 - **FR-003**: System MUST distinguish User messages (right-aligned, primary background) from AI messages (left-aligned, neutral background).
 - **FR-004**: System MUST display a visual "thinking" or "loading" state while waiting for an AI response.
-- **FR-005**: System MUST support Markdown rendering for AI responses (e.g., bold, lists, code blocks) [NEEDS CLARIFICATION: Is full Markdown support required, or just basic text formatting?].
-- **FR-006**: System MUST persist chat history within the current session [NEEDS CLARIFICATION: Should chat history persist across browser restarts via backend storage, or is sessionStorage sufficient?].
+- **FR-005**: System MUST support full Markdown rendering for AI responses, including bold text, lists, tables, and code blocks with syntax highlighting.
+- **FR-006**: System MUST persist chat history across browser restarts by storing and retrieving messages from the backend database.
 
 #### Safety & Accessibility
 

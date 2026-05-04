@@ -22,10 +22,10 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Update FastAPI `Backend/main.py` `CORSMiddleware` to allow origin `http://localhost:5173`
-- [ ] T002 Initialize Vite React app in the `Frontend/` directory
-- [ ] T003 [P] Install dependencies: `tailwindcss`, `postcss`, `autoprefixer`, `lucide-react`, `react-markdown` in `Frontend/`
-- [ ] T004 [P] Configure `Frontend/tailwind.config.js` and `Frontend/src/index.css` with primary color variables
+- [x] T001 Update FastAPI `Backend/main.py` `CORSMiddleware` to allow origin `http://localhost:5173`
+- [x] T002 Initialize Vite React app in the `Frontend/` directory
+- [x] T003 [P] Install dependencies: `tailwindcss`, `postcss`, `autoprefixer`, `lucide-react`, `react-markdown` in `Frontend/`
+- [x] T004 [P] Configure `Frontend/tailwind.config.js` and `Frontend/src/index.css` with primary color variables
 
 ---
 
@@ -33,9 +33,9 @@
 
 **Purpose**: Core logic and utilities required for all user stories
 
-- [ ] T005 Implement storage utility in `Frontend/src/hooks/useSessionStorage.js` with `try/catch` wrappers
-- [ ] T006 Implement API service in `Frontend/src/services/api.js` to handle `/api/ask` and `/api/health` calls
-- [ ] T007 Implement core chat state logic in `Frontend/src/hooks/useChat.js` (history, loading, error states)
+- [x] T005 Implement storage utility in `Frontend/src/hooks/useSessionStorage.js` with `try/catch` wrappers
+- [x] T006 Implement API service in `Frontend/src/services/api.js` to handle `/api/ask` and `/api/health` calls
+- [x] T007 Implement core chat state logic in `Frontend/src/hooks/useChat.js` (history, loading, error states)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -49,11 +49,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [P] [US1] Build `Frontend/src/components/MessageItem.jsx` for user/model message rendering
-- [ ] T009 [P] [US1] Build `Frontend/src/components/InputBar.jsx` with basic send functionality
-- [ ] T010 [US1] Build `Frontend/src/components/MessageList.jsx` to render the message stream
-- [ ] T011 [US1] Build `Frontend/src/components/ChatWindow.jsx` to assemble `MessageList` and `InputBar`
-- [ ] T012 [US1] Integrate `ChatWindow` into `Frontend/src/App.jsx` and verify end-to-end flow
+- [x] T008 [P] [US1] Build `Frontend/src/components/MessageItem.jsx` for user/model message rendering
+- [x] T009 [P] [US1] Build `Frontend/src/components/InputBar.jsx` with basic send functionality
+- [x] T010 [US1] Build `Frontend/src/components/MessageList.jsx` to render the message stream
+- [x] T011 [US1] Build `Frontend/src/components/ChatWindow.jsx` to assemble `MessageList` and `InputBar`
+- [x] T012 [US1] Integrate `ChatWindow` into `Frontend/src/App.jsx` and verify end-to-end flow
 
 **Checkpoint**: MVP Functional - Basic chat interaction works.
 
@@ -67,9 +67,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Update `Frontend/src/App.jsx` layout to ensure 100vh viewport height on mobile browsers
-- [ ] T014 [US2] Apply Tailwind responsive classes to `Frontend/src/components/ChatWindow.jsx` for centered mobile layout
-- [ ] T015 [US2] Implement auto-expanding textarea logic in `Frontend/src/components/InputBar.jsx` for better mobile UX
+- [x] T013 [US2] Update `Frontend/src/App.jsx` layout to ensure 100vh viewport height on mobile browsers
+- [x] T014 [US2] Apply Tailwind responsive classes to `Frontend/src/components/ChatWindow.jsx` for centered mobile layout
+- [x] T015 [US2] Implement auto-expanding textarea logic in `Frontend/src/components/InputBar.jsx` for better mobile UX
 
 **Checkpoint**: Mobile Optimized - UI is fully responsive.
 
@@ -83,10 +83,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T016 [P] [US3] Build "Thinking/Typing" animated indicator in `Frontend/src/components/UI/TypingIndicator.jsx`
-- [ ] T017 [P] [US3] Build Error Toast/Banner in `Frontend/src/components/UI/ErrorDisplay.jsx`
-- [ ] T018 [US3] Integrate loading and error UI into `Frontend/src/components/ChatWindow.jsx`
-- [ ] T019 [US3] Implement auto-scroll to bottom functionality in `Frontend/src/components/MessageList.jsx` using `useRef`
+- [x] T016 [P] [US3] Build "Thinking/Typing" animated indicator in `Frontend/src/components/UI/TypingIndicator.jsx`
+- [x] T017 [P] [US3] Build Error Toast/Banner in `Frontend/src/components/UI/ErrorDisplay.jsx`
+- [x] T018 [US3] Integrate loading and error UI into `Frontend/src/components/ChatWindow.jsx`
+- [x] T019 [US3] Implement auto-scroll to bottom functionality in `Frontend/src/components/MessageList.jsx` using `useRef`
 
 ---
 
@@ -94,10 +94,10 @@
 
 **Purpose**: Final refinements and feature completeness.
 
-- [ ] T020 [P] Implement Markdown rendering in `Frontend/src/components/MessageItem.jsx` using `react-markdown`
-- [ ] T021 [P] Implement Shift+Enter for new lines in `Frontend/src/components/InputBar.jsx`
-- [ ] T022 [P] Configure environment variables in `Frontend/.env` and `Frontend/src/services/api.js`
-- [ ] T023 Final accessibility audit: Verify keyboard navigation and ARIA labels
+- [x] T020 [P] Implement Markdown rendering in `Frontend/src/components/MessageItem.jsx` using `react-markdown`
+- [x] T021 [P] Implement Shift+Enter for new lines in `Frontend/src/components/InputBar.jsx`
+- [x] T022 [P] Configure environment variables in `Frontend/.env` and `Frontend/src/services/api.js`
+- [x] T023 Final accessibility audit: Verify keyboard navigation and ARIA labels
 
 ---
 
