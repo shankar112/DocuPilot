@@ -14,9 +14,9 @@ from langchain_core.embeddings import Embeddings
 from pydantic import BaseModel, Field
 
 
-load_dotenv()
-
 BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
+
 CHROMA_PERSIST_DIR = BASE_DIR / "chroma_db"
 EMBEDDING_MODEL = "gemini-embedding-001"
 GENERATION_MODEL = "gemini-2.5-flash"
