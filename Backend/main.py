@@ -1,4 +1,5 @@
 import os
+import logging
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
@@ -20,6 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent
 CHROMA_PERSIST_DIR = BASE_DIR / "chroma_db"
 EMBEDDING_MODEL = "gemini-embedding-001"
 GENERATION_MODEL = "gemini-2.5-flash"
+ASK_ERROR_MESSAGE = "Sorry, I could not answer that right now. Please try again in a moment."
+EMPTY_MODEL_RESPONSE_MESSAGE = "Sorry, I did not receive a usable answer. Please try asking again."
+
+logger = logging.getLogger(__name__)
 
 
 class Message(BaseModel):
@@ -146,7 +151,6 @@ def _get_api_key() -> str:
     return api_key
 
 
-@lru_cache(maxsize=1)
 def get_genai_client() -> genai.Client:
     return genai.Client(api_key=_get_api_key())
 
@@ -205,6 +209,7 @@ def search_hr_policy(query: str) -> str:
     response_model=AskResponse,
     responses={
         400: {"model": ErrorResponse},
+        502: {"model": ErrorResponse},
         500: {"model": ErrorResponse},
     },
 )
@@ -225,7 +230,8 @@ def ask(request: AskRequest) -> AskResponse:
             for msg in request.history
         ]
 
-        chat = get_genai_client().chats.create(
+        client = get_genai_client()
+        chat = client.chats.create(
             model=GENERATION_MODEL,
             history=history_contents,
             config=types.GenerateContentConfig(
@@ -236,21 +242,36 @@ def ask(request: AskRequest) -> AskResponse:
 
         answer = (getattr(response, "text", None) or "").strip()
         if not answer:
-            raise RuntimeError("Gemini response did not include answer text.")
+            logger.warning("Gemini response did not include answer text.")
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=EMPTY_MODEL_RESPONSE_MESSAGE,
+            )
 
         return AskResponse(
             answer=answer,
             source_context="Agent orchestrated tools to answer this request.",
         )
-    except HTTPException:
-        raise
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
-        ) from exc
-    except Exception as exc:
+    except HTTPException as exc:
+        if exc.status_code in {
+            status.HTTP_400_BAD_REQUEST,
+            status.HTTP_502_BAD_GATEWAY,
+        }:
+            raise
+        logger.exception("Failed to answer question.")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to answer question: {exc}",
+            detail=ASK_ERROR_MESSAGE,
+        ) from exc
+    except ValueError as exc:
+        logger.warning("Invalid ask request: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please check your question and try again.",
+        ) from exc
+    except Exception as exc:
+        logger.exception("Failed to answer question.")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=ASK_ERROR_MESSAGE,
         ) from exc

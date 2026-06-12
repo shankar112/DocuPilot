@@ -1,5 +1,36 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
+const FALLBACK_ERROR_MESSAGE = 'Sorry, I could not get an answer right now. Please try again in a moment.';
+const EMPTY_ANSWER_MESSAGE = 'Sorry, I did not receive a usable answer. Please try asking again.';
+
+class ApiError extends Error {
+  constructor(message = FALLBACK_ERROR_MESSAGE) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+async function parseJsonResponse(response) {
+  try {
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to parse API response:', error);
+    throw new ApiError(FALLBACK_ERROR_MESSAGE);
+  }
+}
+
+function ensureAnswer(data) {
+  const answer = typeof data?.answer === 'string' ? data.answer.trim() : '';
+  if (!answer) {
+    throw new ApiError(EMPTY_ANSWER_MESSAGE);
+  }
+
+  return {
+    ...data,
+    answer
+  };
+}
+
 export const api = {
   async health() {
     try {
@@ -29,14 +60,18 @@ export const api = {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to get answer from AI');
+        await parseJsonResponse(response).catch(() => null);
+        throw new ApiError(FALLBACK_ERROR_MESSAGE);
       }
 
-      return await response.json();
+      const data = await parseJsonResponse(response);
+      return ensureAnswer(data);
     } catch (error) {
       console.error('API Ask Error:', error);
-      throw error;
+      if (error instanceof ApiError) {
+        throw error;
+      }
+      throw new ApiError(FALLBACK_ERROR_MESSAGE);
     }
   },
 

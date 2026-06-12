@@ -1,11 +1,16 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { api } from '../services/api';
+
+const DEFAULT_CHAT_ERROR = 'Sorry, I could not get an answer right now. Please try again in a moment.';
 
 export function useChat() {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState(null);
+  const activeRequestId = useRef(0);
+  const messagesRef = useRef([]);
+  const isSendingRef = useRef(false);
 
   // Load history on mount
   useEffect(() => {
@@ -35,58 +40,70 @@ export function useChat() {
 
   // Sync with backend on change
   useEffect(() => {
+    messagesRef.current = messages;
+
     if (!isInitializing) {
       api.saveHistory(messages).catch(err => console.error('Failed to sync history:', err));
     }
   }, [messages, isInitializing]);
 
   const sendMessage = useCallback(async (text) => {
-    if (!text.trim()) return;
+    const trimmedText = text.trim();
+    if (!trimmedText || isSendingRef.current) return;
+    isSendingRef.current = true;
+
+    const historyForApi = messagesRef.current.map(msg => ({
+      role: msg.role,
+      text: msg.text
+    }));
 
     const userMessage = {
       id: Date.now().toString(),
       role: 'user',
-      text: text.trim(),
+      text: trimmedText,
       timestamp: new Date().toISOString()
     };
+    const requestId = activeRequestId.current + 1;
+    activeRequestId.current = requestId;
+    const isCurrentRequest = () => activeRequestId.current === requestId;
 
-    setMessages(prev => {
-      const newMessages = [...prev, userMessage];
-      
-      (async () => {
-        setIsLoading(true);
+    setIsLoading(true);
+    setError(null);
+    setMessages(prev => [...prev, userMessage]);
+
+    try {
+      const response = await api.ask(trimmedText, historyForApi);
+
+      const aiMessage = {
+        id: `${Date.now()}-model`,
+        role: 'model',
+        text: response.answer,
+        timestamp: new Date().toISOString()
+      };
+
+      if (isCurrentRequest()) {
+        setMessages(current => [...current, aiMessage]);
         setError(null);
-
-        try {
-          const historyForApi = prev.map(msg => ({ 
-            role: msg.role, 
-            text: msg.text 
-          }));
-          
-          const response = await api.ask(text.trim(), historyForApi);
-          
-          const aiMessage = {
-            id: (Date.now() + 1).toString(),
-            role: 'model',
-            text: response.answer,
-            timestamp: new Date().toISOString()
-          };
-
-          setMessages(current => [...current, aiMessage]);
-        } catch (err) {
-          setError(err.message || 'Something went wrong. Please try again.');
-        } finally {
-          setIsLoading(false);
-        }
-      })();
-
-      return newMessages;
-    });
+      }
+    } catch (err) {
+      console.error('Failed to send message:', err);
+      if (isCurrentRequest()) {
+        setError(err.message || DEFAULT_CHAT_ERROR);
+      }
+    } finally {
+      if (isCurrentRequest()) {
+        isSendingRef.current = false;
+        setIsLoading(false);
+      }
+    }
   }, []);
 
   const clearChat = useCallback(() => {
+    activeRequestId.current += 1;
+    isSendingRef.current = false;
     setMessages([]);
     setError(null);
+    setIsLoading(false);
   }, []);
 
   return {
