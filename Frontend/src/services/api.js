@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://docupilot-1.onrender.com';
 
 const FALLBACK_ERROR_MESSAGE = 'Sorry, I could not get an answer right now. Please try again in a moment.';
 const EMPTY_ANSWER_MESSAGE = 'Sorry, I did not receive a usable answer. Please try asking again.';

@@ -15,9 +15,9 @@ from langchain_core.embeddings import Embeddings
 from pydantic import BaseModel, Field
 
 
-load_dotenv()
-
 BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
+
 CHROMA_PERSIST_DIR = BASE_DIR / "chroma_db"
 EMBEDDING_MODEL = "gemini-embedding-001"
 GENERATION_MODEL = "gemini-2.5-flash"
@@ -91,9 +91,26 @@ class GoogleGenAIEmbeddings(Embeddings):
 
 app = FastAPI(title="DocuPilot API", version="1.0.0")
 
+
+def _get_cors_origins() -> list[str]:
+    configured_origins = os.getenv("CORS_ORIGINS", "")
+    extra_origins = [
+        origin.strip()
+        for origin in configured_origins.split(",")
+        if origin.strip()
+    ]
+
+    return [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://docu-pilot-eta.vercel.app",
+        *extra_origins,
+    ]
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=_get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
