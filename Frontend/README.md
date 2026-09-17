@@ -1,16 +1,128 @@
-# React + Vite
+# DocuPilot Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite frontend for DocuPilot. This app provides the chat UI, sends user questions to the FastAPI backend, renders model responses, and syncs chat history through the backend history endpoints.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React `19`
+- Vite `8`
+- Tailwind CSS `4`
+- lucide-react icons
+- react-markdown for rendering assistant messages
 
-## React Compiler
+## Main Files
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```text
+Frontend/
++-- src/
+|   +-- App.jsx                     # New/Old UI mode toggle
+|   +-- main.jsx                    # React entry point
+|   +-- components/
+|   |   +-- ChatWindow.jsx          # Current chat UI
+|   |   +-- OldChatWindow.jsx       # Preserved older UI
+|   |   +-- MessageList.jsx
+|   |   +-- MessageItem.jsx
+|   |   +-- InputBar.jsx
+|   +-- hooks/
+|   |   +-- useChat.js              # Message state, loading/error state, API calls
+|   |   +-- useSessionStorage.js    # Persists UI mode
+|   +-- services/
+|   |   +-- api.js                  # Backend API client
++-- package.json
++-- .env.example
+```
 
-## Expanding the ESLint configuration
+## API Integration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The API base URL comes from:
+
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8000
+```
+
+If `VITE_API_BASE_URL` is not set, the frontend falls back to:
+
+```text
+https://docupilot-1.onrender.com
+```
+
+Used endpoints:
+
+- `GET /api/health`
+- `POST /api/ask`
+- `GET /api/history`
+- `POST /api/history`
+
+`POST /api/ask` sends:
+
+```json
+{
+  "question": "User question",
+  "history": [
+    {
+      "role": "user",
+      "text": "Previous user message"
+    },
+    {
+      "role": "model",
+      "text": "Previous model message"
+    }
+  ]
+}
+```
+
+## Running Locally
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create local env file:
+
+```bash
+copy .env.example .env
+```
+
+Start the dev server:
+
+```bash
+npm run dev
+```
+
+The Vite dev server usually runs at:
+
+```text
+http://localhost:5173
+```
+
+Make sure the backend is running at the URL configured in `VITE_API_BASE_URL`.
+
+## Scripts
+
+```bash
+npm run dev      # Start Vite dev server
+npm run build    # Build production assets
+npm run preview  # Preview production build
+npm run lint     # Run ESLint
+```
+
+There is currently no frontend test script configured.
+
+## Usage
+
+The app opens to the current chat interface. Ask a question about the indexed HR policy document and the frontend will send it to the backend.
+
+The top-right toggle switches between:
+
+- `New`: current React chat interface
+- `Old`: preserved older chat UI
+
+The selected UI mode is stored in `sessionStorage` under:
+
+```text
+docupilot-ui-mode
+```
+
+Chat messages are loaded from and saved to the backend via `/api/history`.
